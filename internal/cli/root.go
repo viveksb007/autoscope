@@ -51,7 +51,14 @@ through a simple subcommand surface. See docs/TOOL.md for full contract.`,
 		return nil
 	}
 
-	cmd.AddCommand(newVersionCmd())
+	cmd.AddCommand(
+		newVersionCmd(),
+		newInstallCmd(),
+		newCleanupCmd(),
+		newExecCmd(),
+		newLogsCmd(),
+		newMetricsCmd(),
+	)
 
 	return cmd
 }
