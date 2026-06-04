@@ -6,8 +6,11 @@ import (
 
 // Build-time vars (set via -ldflags in Phase 7).
 var (
-	Version     = "v0.1.0-dev"
-	ImageDigest = "nicolaka/netshoot@sha256:0000000000000000000000000000000000000000000000000000000000000000"
+	Version = "v0.1.0-dev"
+	// ImageDigest is the default debug pod image. Override with --image at runtime.
+	// TODO: pin to a verified sha256 digest before tagging v0.1.0; current default
+	// is the moving :latest tag of nicolaka/netshoot. See docs/SECURITY.md.
+	ImageDigest = "nicolaka/netshoot:latest"
 )
 
 // GlobalFlags holds persistent flags shared by all subcommands.

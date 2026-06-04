@@ -83,11 +83,10 @@ Bootstrap target namespace.
 
 Run an arbitrary command in the host PID 1 namespaces.
 
-- **Synopsis**: `auto exec <node> [--ns LIST] [--container] -- <cmd> [args...]`
+- **Synopsis**: `auto exec <node> [--ns LIST] -- <cmd> [args...]`
 - **Required args**: `<node>` (node name), `<cmd...>` (after `--`).
 - **Optional flags**:
   - `--ns LIST`: comma-list of namespaces to enter, default `mount,uts,ipc,pid` (host net is always available since debug pod is hostNetwork). Valid: `mount,uts,ipc,net,pid,cgroup`.
-  - `--container N`: container name in debug pod (default `auto`).
 - **Argv handling**: `<cmd...>` is passed directly to `nsenter`. **Do NOT** rely on shell builtins (`if`, `&&`, glob expansion) — Bottlerocket's host PID 1 shell `brush` rejects most utilities. Pass full binary paths: `/usr/bin/journalctl`, `/usr/bin/ctr`, etc.
 - **Output (default)**: stdout/stderr passthrough. Exit code = remote exit code.
 - **Output (--json)**: not applicable; binary stdout streamed.
@@ -205,9 +204,9 @@ Delete debug pods.
 - **Required args**: none
 - **Optional flags**:
   - `--node NODE`: delete only the debug pod for this node.
-  - `--all`: all debug pods in target namespace (default if neither specified).
-  - `--ttl-only`: delete only pods past their TTL annotation; leave fresh ones.
-  - `--yes`: skip confirmation prompt.
+  - `--all`: all debug pods in target namespace (default if neither `--node` nor `--ttl-only` specified).
+  - `--ttl-only`: delete only TTL-expired or terminal-phase pods; leaves fresh ones. Suppresses confirmation prompt automatically.
+  - `--yes`: skip confirmation prompt (`--yes` is global). `--ttl-only` already skips it.
 - **Output (default)**: one line per pod deleted: `deleted auto-debug-<sha8>` ; final summary `<N> pod(s) deleted`.
 - **Output (--json)**: `{"event":"pod.deleted","name":"...","node":"..."}` per deletion.
 - **Failure modes**:
