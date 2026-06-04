@@ -73,18 +73,14 @@ EKS Auto Mode runs Bottlerocket on managed nodes. No SSH, no user SSM session, n
 
 | Resource | Verbs | Used by |
 |---|---|---|
-| `pods` (in target ns) | `create, get, list, delete` | debug pod lifecycle |
+| `pods` (in target ns) | `create, get, list, delete, patch, watch` | debug pod lifecycle, TTL refresh, readiness watch |
 | `pods/exec` (in target ns) | `create` | all commands |
-| `pods/log` (in target ns) | `get` | error reporting on pod failures |
-| `pods/status` (in target ns) | `get` | TTL/health checks |
-| `nodes` | `get, list` | node selection, kubeconfig validation |
 | `nodes/proxy` | `get` | kubelet metrics + `configz` discovery |
 | `namespaces` | `create, get` | `auto install` baseline |
 | `namespaces` | `patch` | `auto install --auto-label` (relaxes PSA on existing ns) |
-| `selfsubjectaccessreviews` | `create` | preflight check |
 
 - **PSA**: target namespace must allow privileged pods — `pod-security.kubernetes.io/enforce=privileged`. `auto install` creates the namespace fresh with this label; for an existing namespace lacking the label, `auto install --auto-label` patches it (refusal mode otherwise). On clusters where caller lacks `namespaces:create`, namespace must be pre-provisioned.
-- Preflight: each command runs `SelfSubjectAccessReview` for the verbs it will exercise; missing perms produce a single line listing all gaps before any kubeapi mutation.
+- Preflight: deferred to v0.2. v0.1 surfaces RBAC errors at first kube-API call; failing fast with a clear message is the responsibility of the caller's RBAC pre-check.
 
 ### NFR2 — Output
 - Human text by default.

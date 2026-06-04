@@ -72,7 +72,7 @@ Full contract: [docs/TOOL.md](docs/TOOL.md). Agent-driving prompts: [docs/COMPLI
 ## Requirements
 
 - Caller's kubeconfig
-- RBAC: `pods` create/get/list/delete, `pods/exec` create, `pods/log` get, `nodes/proxy` get, `namespaces` create (+ `patch` if `--auto-label`), `selfsubjectaccessreviews` create
+- RBAC: `pods` create/get/list/delete/patch/watch, `pods/exec` create, `nodes/proxy` get, `namespaces` create/get (+ `patch` if `--auto-label`)
 - Cluster admits privileged pods in target namespace (PSA `privileged`)
 - Network reachability to API server
 

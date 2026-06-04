@@ -17,15 +17,11 @@ If your cluster's threat model treats `pods:create` with privileged admission as
 
 | Resource | Verbs | Used by |
 |---|---|---|
-| `pods` (in target ns) | `create, get, list, delete` | debug pod lifecycle |
+| `pods` (in target ns) | `create, get, list, delete, patch, watch` | debug pod lifecycle; TTL refresh via strategic-merge-patch; readiness via watch |
 | `pods/exec` (in target ns) | `create` | every subcommand |
-| `pods/log` (in target ns) | `get` | error reporting on pod failures |
-| `pods/status` (in target ns) | `get` | TTL/health checks |
-| `nodes` | `get, list` | node selection |
 | `nodes/proxy` | `get` | kubelet metrics + `configz` runtime endpoint discovery |
 | `namespaces` | `create, get` | `auto install` baseline |
 | `namespaces` | `patch` | `auto install --auto-label` (relaxes PSA on existing ns) |
-| `selfsubjectaccessreviews` | `create` | preflight verb checks |
 
 Minimum ClusterRole:
 
@@ -37,22 +33,16 @@ metadata:
 rules:
 - apiGroups: [""]
   resources: ["pods"]
-  verbs: ["create", "get", "list", "delete"]
+  verbs: ["create", "get", "list", "delete", "patch", "watch"]
 - apiGroups: [""]
-  resources: ["pods/exec", "pods/log", "pods/status"]
-  verbs: ["create", "get"]
-- apiGroups: [""]
-  resources: ["nodes"]
-  verbs: ["get", "list"]
+  resources: ["pods/exec"]
+  verbs: ["create"]
 - apiGroups: [""]
   resources: ["nodes/proxy"]
   verbs: ["get"]
 - apiGroups: [""]
   resources: ["namespaces"]
   verbs: ["create", "get", "patch"]
-- apiGroups: ["authorization.k8s.io"]
-  resources: ["selfsubjectaccessreviews"]
-  verbs: ["create"]
 ```
 
 ## Pod Security Admission
