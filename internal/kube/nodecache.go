@@ -19,10 +19,9 @@ type NodeCache struct {
 }
 
 type creEntry struct {
-	once   sync.Once
-	value  string
-	err    error
-	loaded bool
+	once  sync.Once
+	value string
+	err   error
 }
 
 func NewNodeCache(d *Deps) *NodeCache {
@@ -54,11 +53,7 @@ func (n *NodeCache) ContainerRuntimeEndpoint(ctx context.Context, node string) (
 	e := n.entry(node)
 	e.once.Do(func() {
 		e.value, e.err = n.fetchCRE(ctx, node)
-		e.loaded = true
 	})
-	if !e.loaded {
-		return DefaultRuntimeSocket, fmt.Errorf("nodecache: incomplete state for %s", node)
-	}
 	return e.value, e.err
 }
 
