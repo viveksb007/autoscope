@@ -58,6 +58,7 @@ through a simple subcommand surface. See docs/TOOL.md for full contract.`,
 		newExecCmd(),
 		newLogsCmd(),
 		newMetricsCmd(),
+		newObserveCmd(),
 	)
 
 	return cmd
