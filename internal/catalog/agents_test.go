@@ -53,3 +53,49 @@ func TestEndpointNames(t *testing.T) {
 		t.Errorf("kubelet should have 4 endpoints, got %v", names)
 	}
 }
+
+func TestNetworkPolicyDefaultIsFile(t *testing.T) {
+	a := Lookup("network-policy")
+	def := a.DefaultLog()
+	if def.Kind != LogKindFile {
+		t.Errorf("network-policy default log Kind = %v, want File", def.Kind)
+	}
+	if def.Path != "/var/log/aws-routed-eni/network-policy-agent.log" {
+		t.Errorf("network-policy default log Path = %q, want network-policy-agent.log", def.Path)
+	}
+	if def.Name != "policy" {
+		t.Errorf("network-policy default Name = %q, want policy", def.Name)
+	}
+}
+
+func TestKubeletDefaultIsJournal(t *testing.T) {
+	a := Lookup("kubelet")
+	def := a.DefaultLog()
+	if def.Kind != LogKindJournal || def.Unit != "kubelet.service" {
+		t.Errorf("kubelet default log = %+v, want journal/kubelet.service", def)
+	}
+}
+
+func TestFindLog(t *testing.T) {
+	a := Lookup("network-policy")
+	if _, ok := a.FindLog("policy"); !ok {
+		t.Error("FindLog(policy) miss for network-policy")
+	}
+	if _, ok := a.FindLog("bpf"); !ok {
+		t.Error("FindLog(bpf) miss for network-policy")
+	}
+	if _, ok := a.FindLog("journal"); !ok {
+		t.Error("FindLog(journal) miss for network-policy")
+	}
+	if _, ok := a.FindLog("nope"); ok {
+		t.Error("FindLog(nope) should miss")
+	}
+}
+
+func TestUnknownAliasFallbackHasJournal(t *testing.T) {
+	a := Lookup("custom-svc")
+	def := a.DefaultLog()
+	if def.Kind != LogKindJournal || def.Unit != "custom-svc.service" {
+		t.Errorf("fallback default log = %+v, want journal/custom-svc.service", def)
+	}
+}

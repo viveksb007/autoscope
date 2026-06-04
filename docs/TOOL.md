@@ -103,27 +103,36 @@ Run an arbitrary command in the host PID 1 namespaces.
 
 ### `auto logs <agent> <node>`
 
-Stream host-systemd journal for a unit.
+Stream logs from an on-node agent. Each catalog agent has one or more **log sources** (file or systemd-journal). Default is the agent's first source — typically the most informative one.
 
-- **Synopsis**: `auto logs <agent> <node> [--tail | --since DUR | --lines N] [--grep REGEX]`
+- **Synopsis**: `auto logs <agent> <node> [--source NAME | --source list] [--tail | --since DUR | --lines N] [--grep REGEX]`
 - **Required args**: `<agent>` (catalog alias OR raw unit name like `kubelet.service`), `<node>`.
 - **Optional flags**:
-  - `--tail` / `-f`: follow.
-  - `--since DUR`: `5m`, `1h`, RFC3339 timestamp.
-  - `--lines N`: last N lines (default `200`).
-  - `--grep REGEX`: client-side regex filter.
-- **Argument resolution**: `<agent>` → catalog lookup (see Catalog below). Unknown alias → treat as literal unit name.
-- **Output (default)**: journalctl plain text, line-by-line.
-- **Output (--json)**: each line wrapped as `{"event":"log","ts":"...","node":"...","unit":"...","line":"..."}`.
+  - `--source NAME`: catalog log source name (see Catalog below). Default: agent's first source. `--source list` enumerates available sources for the agent and exits.
+  - `--tail` / `-f`: follow (`journalctl -f` for journal sources, `tail -F` for file sources).
+  - `--since DUR`: `5m`, `1h`, RFC3339 — **journal sources only** (silently ignored for file sources).
+  - `--lines N`: last N lines (default `200`; ignored when `--tail` set).
+  - `--grep REGEX`: client-side regex filter applied to the streamed output.
+- **Argument resolution**: `<agent>` → catalog lookup (see Catalog below). Unknown alias → synthesizes a `{Name: "journal", Unit: <alias>.service}` source.
+- **Source resolution**:
+  1. `--source list` ⇒ print sources, exit 0.
+  2. `--source ""` (omitted) ⇒ agent's first source.
+  3. `--source NAME` matches catalog ⇒ that source.
+  4. `--source journal` for an agent w/o explicit journal entry ⇒ synthesize from agent's primary `Unit`.
+  5. Else ⇒ exit 1 listing available source names.
+- **Output (default)**: raw bytes from the remote process (line-delimited).
 - **Failure modes**:
-  - Unit absent on node → exit 3, stderr: `systemd unit '<unit>' not present on node <node>`.
-  - Bottlerocket SELinux blocks systemctl — `auto logs` does not use systemctl, so this is not a failure mode here.
+  - Unit absent on node (journal source) → exit 3, message: `systemd unit '<unit>' not present on node`.
+  - Log file absent on node (file source) → exit 3, message: `log file '<path>' not present on node (source='<name>')`.
 - **Examples**:
   ```
   auto logs kubelet i-0a449a5e52b88c278 --lines 50
   auto logs kubelet i-0a449a5e52b88c278 --tail
-  auto logs ipamd i-0a449a5e52b88c278 --since 10m --grep "ENI"
-  auto logs eks-node-monitoring-agent.service i-0a449a5e52b88c278 --lines 20
+  auto logs network-policy i-0a449a5e52b88c278 --source list
+  auto logs network-policy i-0a449a5e52b88c278 --tail            # default = network-policy-agent.log
+  auto logs network-policy i-0a449a5e52b88c278 --source bpf      # ebpf-sdk.log
+  auto logs network-policy i-0a449a5e52b88c278 --source journal  # journalctl (DNS proxy access log)
+  auto logs ipamd i-0a449a5e52b88c278 --source plugin --grep "ADD"
   ```
 
 ---
@@ -232,6 +241,8 @@ Print version and pinned image digest.
 
 Built-in agent aliases. Pass any of these as `<agent>` to `auto logs` or `auto metrics`. Unknown aliases fall through to literal unit names (you must then provide `--port`/`--path` for `auto metrics`).
 
+### Endpoints
+
 | Alias | Unit | metrics endpoint | healthz endpoint | Notes |
 |---|---|---|---|---|
 | `kubelet` | `kubelet.service` | apiserver-proxy `/metrics` | node `:10248/healthz` | Also `cadvisor`, `resource` endpoints |
@@ -247,7 +258,21 @@ Built-in agent aliases. Pass any of these as `<agent>` to `auto logs` or `auto m
 | `ebs-csi-registrar` | `eks-ebs-csi-driver-registrar.service` | — | — | Logs only |
 | `efa` | `efa-k8s-device-plugin.service` | — | — | Logs only |
 
-All ports verified live on EKS Auto Standard 2026.6.3 — see `VERIFY.md`.
+### Log sources (use with `--source NAME`)
+
+| Alias | Default source (first listed) | Other sources |
+|---|---|---|
+| `kubelet` | `journal` (kubelet.service) | — |
+| `containerd` | `journal` (containerd.service) | — |
+| `kube-proxy` | `journal` (kube-proxy.service) | — |
+| `ipamd` | `ipamd` file (`/var/log/aws-routed-eni/ipamd.log`) | `plugin` (`plugin.log`), `egress-v6` (`egress-v6-plugin.log`), `journal` |
+| `network-policy` | `policy` file (`/var/log/aws-routed-eni/network-policy-agent.log`) | `bpf` (`ebpf-sdk.log`), `journal` (DNS proxy access log) |
+| `node-monitor` | `journal` (eks-node-monitoring-agent.service) | — |
+| `pod-identity` | `journal` (eks-pod-identity-agent.service) | — |
+| `coredns` | `journal` (coredns.service) | — |
+| `healthchecker` / `ebs-csi*` / `efa` | `journal` | — |
+
+All endpoints + log paths verified live on EKS Auto Standard 2026.6.3 — see `VERIFY.md`.
 
 ## Common Workflows
 

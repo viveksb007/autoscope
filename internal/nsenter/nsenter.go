@@ -61,6 +61,28 @@ func JournalUnitProbe(unit string) []string {
 		"--output=cat", "--no-pager")
 }
 
+// TailFile builds a `tail` invocation in the host mount-ns for a file log.
+//
+// follow=true ⇒ -F (re-open on rotation, equivalent to journalctl -f).
+// lines       ⇒ -n N if > 0, otherwise tail's default last 10.
+func TailFile(path string, follow bool, lines int) []string {
+	args := []string{"/usr/bin/tail"}
+	if follow {
+		args = append(args, "-F")
+	}
+	if lines > 0 {
+		args = append(args, "-n", strconv.Itoa(lines))
+	}
+	args = append(args, path)
+	return HostMount(args...)
+}
+
+// FileExistsProbe returns argv that succeeds (exit 0) iff `path` is a regular
+// file on the host. Used by `auto logs` source-existence preflight.
+func FileExistsProbe(path string) []string {
+	return HostMount("/usr/bin/test", "-f", path)
+}
+
 // FindSystemdUnitFile builds a fallback discovery for unit files when
 // journalctl probe is empty. Searches both /etc/systemd/system and
 // the arch-suffixed sys-root path.
