@@ -25,8 +25,9 @@ func newMetricsCmd() *cobra.Command {
 		tail     time.Duration
 	)
 	cmd := &cobra.Command{
-		Use:   "metrics <agent> <node>",
-		Short: "Pull Prometheus metrics or healthz from an on-node agent",
+		Use:               "metrics <agent> <node>",
+		Short:             "Pull Prometheus metrics or healthz from an on-node agent",
+		ValidArgsFunction: completeAgentsThenNodes,
 		Long: `Resolution order (per docs/TOOL.md):
   1. --port AND --path set        -> node transport, ignore catalog
   2. --port XOR --path             -> exit 1

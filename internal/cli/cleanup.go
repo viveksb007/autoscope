@@ -61,6 +61,7 @@ or in terminal phase (Succeeded/Failed).`,
 		},
 	}
 	cmd.Flags().StringVar(&node, "node", "", "Delete only the debug pod for this node")
+	_ = cmd.RegisterFlagCompletionFunc("node", completeNodes)
 	cmd.Flags().BoolVar(&all, "all", false, "Delete every debug pod in the namespace")
 	cmd.Flags().BoolVar(&ttlOnly, "ttl-only", false, "Delete only TTL-expired or terminal pods")
 	return cmd

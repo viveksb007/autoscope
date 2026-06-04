@@ -26,9 +26,10 @@ func newLogsCmd() *cobra.Command {
 		noProbe bool
 	)
 	cmd := &cobra.Command{
-		Use:   "logs <agent> <node>",
-		Short: "Stream host-systemd journal for an on-node unit",
-		Args:  cobra.ExactArgs(2),
+		Use:               "logs <agent> <node>",
+		Short:             "Stream host-systemd journal for an on-node unit",
+		Args:              cobra.ExactArgs(2),
+		ValidArgsFunction: completeAgentsThenNodes,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			alias, node := args[0], args[1]
 			ctx := cmd.Context()

@@ -23,7 +23,8 @@ inside the host's mount/uts/ipc/pid namespaces (configurable via --ns).
 
 Bottlerocket's host PID 1 shell rejects most utilities; argv[0] must be a
 direct binary path (e.g. /usr/bin/journalctl). No /bin/sh -c wrapper.`,
-		Args: cobra.MinimumNArgs(2), // <node> <cmd>...
+		Args:              cobra.MinimumNArgs(2), // <node> <cmd>...
+		ValidArgsFunction: completeNodesOnly,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			node := args[0]
 			rest := args[1:]

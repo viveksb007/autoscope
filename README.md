@@ -4,6 +4,27 @@ Laptop-driven on-node debugger for **EKS Auto Mode** (Bottlerocket).
 
 EKS Auto nodes have no SSH and no user-accessible SSM session. `auto` spawns a privileged hostPID pod on the target node and exposes `tcpdump`, `journalctl`, host-localhost metrics, and arbitrary host-PID-1 commands behind a small subcommand surface.
 
+## Shell completion
+
+`auto` ships dynamic completion for `<agent>` aliases (from the catalog) and `<node>` names (live from your apiserver).
+
+```sh
+# bash
+source <(./auto completion bash)
+# or persistent:
+./auto completion bash | sudo tee /etc/bash_completion.d/auto
+
+# zsh
+source <(./auto completion zsh)
+# or persistent (one-time):
+./auto completion zsh > "${fpath[1]}/_auto"
+
+# fish
+./auto completion fish | source
+```
+
+Then `auto logs <TAB>` lists `kubelet, ipamd, kube-proxy, ...` with descriptions, and `auto logs kubelet <TAB>` lists node names from the active cluster context.
+
 ## Quick start
 
 ```sh
