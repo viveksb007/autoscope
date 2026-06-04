@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -35,9 +36,16 @@ func LoadDeps(kubeconfigPath, contextName string) (*Deps, error) {
 	if contextName != "" {
 		overrides.CurrentContext = contextName
 	}
-	cfg, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loader, overrides).ClientConfig()
+
+	// Load raw config once; derive REST config from it.
+	raw, err := loader.Load()
 	if err != nil {
 		return nil, fmt.Errorf("load kubeconfig %s: %w", kubeconfigPath, err)
+	}
+	cc := clientcmd.NewDefaultClientConfig(*raw, overrides)
+	cfg, err := cc.ClientConfig()
+	if err != nil {
+		return nil, fmt.Errorf("derive REST config from %s: %w", kubeconfigPath, err)
 	}
 
 	cs, err := kubernetes.NewForConfig(cfg)
@@ -45,14 +53,23 @@ func LoadDeps(kubeconfigPath, contextName string) (*Deps, error) {
 		return nil, fmt.Errorf("clientset: %w", err)
 	}
 
-	resolved, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loader, overrides).RawConfig()
-	if err != nil {
-		return nil, fmt.Errorf("raw kubeconfig: %w", err)
-	}
-	current := resolved.CurrentContext
+	current := raw.CurrentContext
 	if contextName != "" {
 		current = contextName
 	}
 
 	return &Deps{Clientset: cs, Config: cfg, Context: current}, nil
+}
+
+// CheckClusterSuffix returns an error if `suffix` is non-empty and the
+// active context name does not end with it. Use to guardrail against
+// running against the wrong cluster.
+func (d *Deps) CheckClusterSuffix(suffix string) error {
+	if suffix == "" {
+		return nil
+	}
+	if !strings.HasSuffix(d.Context, suffix) {
+		return fmt.Errorf("context %q does not end with required suffix %q", d.Context, suffix)
+	}
+	return nil
 }

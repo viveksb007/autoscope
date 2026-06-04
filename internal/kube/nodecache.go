@@ -15,30 +15,54 @@ const DefaultRuntimeSocket = "/run/containerd/containerd.sock"
 type NodeCache struct {
 	deps *Deps
 	mu   sync.Mutex
-	cre  map[string]string // node -> /path/to/runtime.sock
-	arch map[string]string // node -> "x86_64" | "aarch64"
+	cre  map[string]*creEntry
+}
+
+type creEntry struct {
+	once   sync.Once
+	value  string
+	err    error
+	loaded bool
 }
 
 func NewNodeCache(d *Deps) *NodeCache {
 	return &NodeCache{
 		deps: d,
-		cre:  make(map[string]string),
-		arch: make(map[string]string),
+		cre:  make(map[string]*creEntry),
 	}
+}
+
+func (n *NodeCache) entry(node string) *creEntry {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	e, ok := n.cre[node]
+	if !ok {
+		e = &creEntry{}
+		n.cre[node] = e
+	}
+	return e
 }
 
 // ContainerRuntimeEndpoint returns the host filesystem path of the containerd
 // socket on the given node. Reads kubelet /configz via apiserver-proxy and
 // strips the unix:// prefix. Falls back to DefaultRuntimeSocket on error,
 // returning the error so callers can warn.
+//
+// Concurrent calls for the same node deduplicate via sync.Once; the first
+// caller fetches, subsequent callers receive the cached value.
 func (n *NodeCache) ContainerRuntimeEndpoint(ctx context.Context, node string) (string, error) {
-	n.mu.Lock()
-	if v, ok := n.cre[node]; ok {
-		n.mu.Unlock()
-		return v, nil
+	e := n.entry(node)
+	e.once.Do(func() {
+		e.value, e.err = n.fetchCRE(ctx, node)
+		e.loaded = true
+	})
+	if !e.loaded {
+		return DefaultRuntimeSocket, fmt.Errorf("nodecache: incomplete state for %s", node)
 	}
-	n.mu.Unlock()
+	return e.value, e.err
+}
 
+func (n *NodeCache) fetchCRE(ctx context.Context, node string) (string, error) {
 	raw, err := n.deps.Clientset.RESTClient().
 		Get().
 		AbsPath(fmt.Sprintf("/api/v1/nodes/%s/proxy/configz", node)).
@@ -60,9 +84,5 @@ func (n *NodeCache) ContainerRuntimeEndpoint(ctx context.Context, node string) (
 	if path == "" {
 		path = DefaultRuntimeSocket
 	}
-
-	n.mu.Lock()
-	n.cre[node] = path
-	n.mu.Unlock()
 	return path, nil
 }
