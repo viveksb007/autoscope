@@ -1,0 +1,17 @@
+# Built binaries
+/auto
+/smoke
+
+# Test artifacts
+tcpdump-*.pcap
+/tmp/auto-e2e-*.pcap
+
+# Editor / OS noise
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Go test/coverage outputs
+*.out
+*.test
