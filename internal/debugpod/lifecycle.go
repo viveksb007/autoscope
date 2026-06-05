@@ -14,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/viveksbh/autoscope/internal/exitcode"
+	"github.com/viveksb007/autoscope/internal/exitcode"
 )
 
 // Handle is returned by Ensure: it identifies the running debug pod and

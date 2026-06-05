@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/viveksbh/autoscope/internal/cli"
-	"github.com/viveksbh/autoscope/internal/exitcode"
+	"github.com/viveksb007/autoscope/internal/cli"
+	"github.com/viveksb007/autoscope/internal/exitcode"
 )
 
 func main() {

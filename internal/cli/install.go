@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/viveksbh/autoscope/internal/debugpod"
+	"github.com/viveksb007/autoscope/internal/debugpod"
 )
 
 func newInstallCmd() *cobra.Command {

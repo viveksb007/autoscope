@@ -8,8 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/viveksbh/autoscope/internal/debugpod"
-	"github.com/viveksbh/autoscope/internal/exitcode"
+	"github.com/viveksb007/autoscope/internal/debugpod"
+	"github.com/viveksb007/autoscope/internal/exitcode"
 )
 
 func newCleanupCmd() *cobra.Command {

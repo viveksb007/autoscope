@@ -1,4 +1,4 @@
-module github.com/viveksbh/autoscope
+module github.com/viveksb007/autoscope
 
 go 1.25.1
 

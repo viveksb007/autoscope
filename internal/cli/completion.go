@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/viveksbh/autoscope/internal/catalog"
-	"github.com/viveksbh/autoscope/internal/kube"
+	"github.com/viveksb007/autoscope/internal/catalog"
+	"github.com/viveksb007/autoscope/internal/kube"
 )
 
 // completeAgents returns catalog aliases as completion candidates with

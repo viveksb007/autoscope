@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/viveksbh/autoscope/internal/exitcode"
-	"github.com/viveksbh/autoscope/internal/tcpdump"
+	"github.com/viveksb007/autoscope/internal/exitcode"
+	"github.com/viveksb007/autoscope/internal/tcpdump"
 )
 
 func newObserveCmd() *cobra.Command {

@@ -1,7 +1,7 @@
 # Auto Debugger — Implementation Plan
 
 ## Phase 0 — Repo init + image pin (20 min)
-- `go mod init github.com/viveksbh/autoscope`
+- `go mod init github.com/viveksb007/autoscope`
 - Add deps: `cobra`, `client-go`, `cli-runtime`, `kubectl/pkg/cmd/exec`.
 - Stub `cmd/auto/main.go` with cobra root + version subcommand.
 - Pin `nicolaka/netshoot` digest: `crane digest nicolaka/netshoot:latest` → record in `internal/debugpod/manifest.go`.

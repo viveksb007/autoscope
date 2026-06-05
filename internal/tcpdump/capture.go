@@ -14,9 +14,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/viveksbh/autoscope/internal/debugpod"
-	"github.com/viveksbh/autoscope/internal/exitcode"
-	"github.com/viveksbh/autoscope/internal/nsenter"
+	"github.com/viveksb007/autoscope/internal/debugpod"
+	"github.com/viveksb007/autoscope/internal/exitcode"
+	"github.com/viveksb007/autoscope/internal/nsenter"
 )
 
 // Opts captures user-supplied tcpdump configuration.

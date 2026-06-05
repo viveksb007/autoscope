@@ -13,7 +13,7 @@ import (
 	"k8s.io/client-go/tools/remotecommand"
 	utilexec "k8s.io/client-go/util/exec"
 
-	"github.com/viveksbh/autoscope/internal/exitcode"
+	"github.com/viveksb007/autoscope/internal/exitcode"
 )
 
 // ExecOpts captures the streams/argv for a single ExecStream call.

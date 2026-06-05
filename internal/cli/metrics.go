@@ -10,10 +10,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/viveksbh/autoscope/internal/catalog"
-	"github.com/viveksbh/autoscope/internal/debugpod"
-	"github.com/viveksbh/autoscope/internal/exitcode"
-	"github.com/viveksbh/autoscope/internal/nsenter"
+	"github.com/viveksb007/autoscope/internal/catalog"
+	"github.com/viveksb007/autoscope/internal/debugpod"
+	"github.com/viveksb007/autoscope/internal/exitcode"
+	"github.com/viveksb007/autoscope/internal/nsenter"
 )
 
 func newMetricsCmd() *cobra.Command {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os/user"
 
-	"github.com/viveksbh/autoscope/internal/exitcode"
-	"github.com/viveksbh/autoscope/internal/kube"
+	"github.com/viveksb007/autoscope/internal/exitcode"
+	"github.com/viveksb007/autoscope/internal/kube"
 )
 
 // SessionDeps bundles the per-invocation runtime objects every subcommand uses.

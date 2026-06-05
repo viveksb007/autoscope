@@ -14,8 +14,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/viveksbh/autoscope/internal/debugpod"
-	"github.com/viveksbh/autoscope/internal/kube"
+	"github.com/viveksb007/autoscope/internal/debugpod"
+	"github.com/viveksb007/autoscope/internal/kube"
 )
 
 func main() {
