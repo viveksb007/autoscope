@@ -116,7 +116,7 @@ Guardrails:
 End-to-end smoke harness (`test/e2e.sh`) drives every command against a live cluster:
 
 ```sh
-make e2e KCTX=viveksbh-Isengard@auto-test.us-west-2.eksctl.io TARGET_NODE=i-0a449a5e52b88c278
+make e2e KCTX=<your-kubeconfig-context> TARGET_NODE=i-0a449a5e52b88c278
 ```
 
 38 assertions across 8 sections (install, exec, logs, metrics, observe, cleanup, completion, guardrails). Runs in ~45s. Cleans its own state via trap.

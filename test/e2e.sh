@@ -3,7 +3,7 @@
 #
 # Usage:
 #   AUTO=./auto \
-#   KCTX=viveksbh-Isengard@auto-test.us-west-2.eksctl.io \
+#   KCTX=<your-kubeconfig-context> \
 #   TARGET_NODE=i-0a449a5e52b88c278 \
 #   test/e2e.sh
 #
