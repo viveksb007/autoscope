@@ -118,7 +118,7 @@ EKS Auto Mode runs Bottlerocket on managed nodes. No SSH, no user SSM session, n
 - `systemctl status|is-active|is-failed|list-units` return **Access denied** even from privileged hostPID nsenter (Bottlerocket SELinux). Liveness must be inferred via `journalctl -u <unit> --since 1m` non-empty result, not systemctl.
 - containerd socket: `/run/containerd/containerd.sock`. Mount as hostPath. Host has `ctr` at `/usr/bin/ctr`; netshoot has neither `ctr` nor `crictl` for v1. PID resolution via `ctr -n k8s.io tasks list`.
 - Container runtime endpoint discovery: read kubelet config via `kubectl get --raw /api/v1/nodes/<node>/proxy/configz` → `containerRuntimeEndpoint`. Cached per session.
-- Auto nodes carry `CriticalAddonsOnly:NoSchedule` (and `karpenter.sh/unregistered:NoExecute` during bootstrap). Tolerate explicitly. `nodeName` set on debug pod bypasses NoSchedule kubelet admission.
+- Auto nodes carry `CriticalAddonsOnly:NoSchedule` (and `karpenter.sh/unregistered:NoExecute` during bootstrap, plus disruption taints as Karpenter recycles nodes). Debug pod tolerates everything (`{Operator: Exists}`) so it reaches sick/cordoned/expiring nodes. `nodeName` set on debug pod bypasses NoSchedule kubelet admission anyway.
 - Kubelet metrics on `:10250/metrics` require bearer auth; pod SA token returns `403` (lacks `nodes/metrics`). **Default path: apiserver-proxy** — `kubectl get --raw /api/v1/nodes/<node>/proxy/metrics` (returns 704 `kubelet_*` series, governed by caller's RBAC `nodes/proxy:get`). `:10248/healthz` is plaintext liveness probe only — not metrics.
 - Multi-arch: Bottlerocket sys-root path includes arch (`/aarch64-bottlerocket-linux-gnu/sys-root/...` or `/x86_64-...`). Read once per node session via `uname -m`.
 

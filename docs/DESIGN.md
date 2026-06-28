@@ -49,9 +49,7 @@ Built once in `debugpod.buildPodSpec(node, ns, imageDigest, runtimeSocket string
 HostPID: true; HostNetwork: true; HostIPC: true
 NodeName: <node>
 Tolerations: [
-  {Key: "CriticalAddonsOnly", Operator: Exists, Effect: NoSchedule},
-  {Key: "karpenter.sh/unregistered", Operator: Exists, Effect: NoExecute},
-  {Operator: Exists, Key: "node.kubernetes.io/not-ready"},      // bootstrap window
+  {Operator: Exists},   // tolerate everything — see rationale below
 ]
 RestartPolicy: Never
 Container[0]:
@@ -76,7 +74,7 @@ Namespace: <flag, default: auto-debug>          # auto-created on first run, not
 Decisions vs. v1 pre-verify:
 - **Drop hostPath `/`**. No host filesystem mount. Containerd socket is the only host mount.
 - **Deterministic pod name** = `auto-debug-<sha8(node)>`. Solves the list-then-create race; `Create` on AlreadyExists path falls through to "fetch + reuse".
-- **Tolerations** narrowed to the actual taint set seen on `i-0a449a5e52b88c278`.
+- **Tolerations** are broad (`{Operator: Exists}` — tolerate every taint). The debug pod targets a node by exact `NodeName`, so the scheduler is bypassed and placement is deterministic regardless of taints. A debugger's whole job is reaching sick nodes; it must run on cordoned, disrupted, or Karpenter-expiring nodes too. Narrowing to a fixed taint set (e.g. `CriticalAddonsOnly`, `karpenter.sh/unregistered`) would silently fail to schedule the moment AWS adds a new Auto taint — exactly when debugging matters most.
 - **Labels hashed** for 63-char safety; full name in annotation.
 - **Namespace** defaults to dedicated `auto-debug`. `kube-system` allowed via `--namespace` for clusters with PSP / PSA blocking arbitrary namespace creation.
 

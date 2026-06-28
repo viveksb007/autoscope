@@ -8,7 +8,7 @@ Image: `nicolaka/netshoot:latest`
 > **Note**: the manifest used in this transcript differs from the production manifest in `DESIGN.md`. Verify-only deltas:
 > - namespace `kube-system` (production: `auto-debug`)
 > - image tag `:latest` (production: `@sha256:<digest>` pinned in Phase 0)
-> - tolerations broadened to `{operator: Exists}` (production: narrowed to known Auto taints)
+> - tolerations `{operator: Exists}` (matches production — tolerate-everything; see DESIGN.md rationale)
 > - extra read-only `/host/proc` and `/host/var/log` mounts (production: only containerd socket)
 >
 > These deltas do not affect any of the test results — every probe runs against host PID 1 / pod-net / host-net, none touch the diff above.

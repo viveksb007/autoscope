@@ -74,9 +74,9 @@ func BuildPodSpec(node, ns, imageRef, runtimeSocket, sessionID, caller string) *
 			HostIPC:       true,
 			RestartPolicy: corev1.RestartPolicyNever,
 			Tolerations: []corev1.Toleration{
-				{Key: "CriticalAddonsOnly", Operator: corev1.TolerationOpExists, Effect: corev1.TaintEffectNoSchedule},
-				{Key: "karpenter.sh/unregistered", Operator: corev1.TolerationOpExists, Effect: corev1.TaintEffectNoExecute},
-				{Key: "node.kubernetes.io/not-ready", Operator: corev1.TolerationOpExists},
+				// Tolerate everything — debug pod targets a specific node by name and
+				// must run even on cordoned/disrupted/expiring nodes.
+				{Operator: corev1.TolerationOpExists},
 			},
 			Containers: []corev1.Container{{
 				Name:  containerName,
