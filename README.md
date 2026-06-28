@@ -1,5 +1,8 @@
 # autoscope — `auto`
 
+[![Build](https://github.com/viveksb007/autoscope/actions/workflows/build.yml/badge.svg)](https://github.com/viveksb007/autoscope/actions/workflows/build.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 CLI-driven on-node debugger for **EKS Auto Mode** (Bottlerocket).
 
 EKS Auto nodes have no SSH and no user-accessible SSM session. `auto` spawns a privileged hostPID pod on the target node and exposes `tcpdump`, `journalctl`, host-localhost metrics, and arbitrary host-PID-1 commands behind a small subcommand surface.
