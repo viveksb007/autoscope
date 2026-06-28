@@ -1,0 +1,52 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: auto
+    main: ./cmd/auto
+    binary: auto
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X github.com/viveksb007/autoscope/internal/cli.Version={{.Version}}
+
+archives:
+  - id: auto
+    formats:
+      - tar.gz
+    name_template: "auto_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+
+brews:
+  - name: auto
+    repository:
+      owner: viveksb007
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/viveksb007/autoscope"
+    description: "On-demand privileged debug pod CLI for EKS Auto Mode (Bottlerocket) nodes — tcpdump, journalctl, metrics, nsenter"
+    license: "MIT"
+    install: |
+      bin.install "auto"
+    test: |
+      system "#{bin}/auto", "version"
