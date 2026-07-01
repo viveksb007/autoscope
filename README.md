@@ -7,6 +7,24 @@ CLI-driven on-node debugger for **EKS Auto Mode** (Bottlerocket).
 
 EKS Auto nodes have no SSH and no user-accessible SSM session. `auto` spawns a privileged hostPID pod on the target node and exposes `tcpdump`, `journalctl`, host-localhost metrics, and arbitrary host-PID-1 commands behind a small subcommand surface.
 
+## Installation
+
+### Homebrew
+
+```sh
+brew install viveksb007/tap/auto
+```
+
+### From source
+
+Requires Go 1.25+.
+
+```sh
+git clone https://github.com/viveksb007/autoscope.git
+cd autoscope
+make build      # produces ./auto
+```
+
 ## Shell completion
 
 `auto` ships dynamic completion for `<agent>` aliases (from the catalog) and `<node>` names (live from your apiserver).
